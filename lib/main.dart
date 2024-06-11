@@ -1,27 +1,13 @@
+import 'dart:ffi';
+
 import 'package:ardcontroller/MainPage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
+import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:flutter/services.dart';
 
 void main() => runApp(MyApp());
-
-// class MyApp extends StatelessWidget {
-//   const MyApp({super.key});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return MaterialApp(home: MainPage());
-//   }
-// }
-
-// class MainpageViewColon extends StatelessWidget {
-//   const MainpageViewColon({super.key});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Center(child: Text("Hello World"));
-//   }
-// }
 
 class MyApp extends StatelessWidget {
   @override
@@ -46,19 +32,49 @@ class _BluetoothAppState extends State<BluetoothApp> {
   @override
   void initState() {
     super.initState();
+    checkPermissionsAndInitBluetooth();
     _getDevices();
-    requestBluetoothPermissions();
+    // requestBluetoothPermissions();
+    // requestPermissions();
   }
 
-  Future<void> requestBluetoothPermissions() async {
-    var status = await Permission.bluetooth.request();
-    if (status.isGranted) {
-      // Permission is granted.
-    } else if (status.isDenied) {
-      // Permission is denied.
-    } else if (status.isPermanentlyDenied) {
-      // Permission is permanently denied, navigate the user to app settings.
-      openAppSettings();
+
+  Future<void> checkPermissionsAndInitBluetooth() async {
+    // Request multiple permissions at once
+    final permissions = [
+      Permission.bluetooth,
+      Permission.bluetoothConnect,
+      Permission.bluetoothScan,
+      Permission.location,
+    ];
+    final statuses = await permissions.request();
+
+    // Check if any permissions are not granted
+    if (statuses.values.any((status) => !status.isGranted)) {
+      // Show an alert or take appropriate action
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text("Some permissions were not granted"),
+      ));
+      return;
+    }
+
+    // Initialize Bluetooth if permissions are granted
+    _getDevices();
+  }
+  
+  // String status = 'false';
+
+  Future<void> checkPermission(Permission permission, BuildContext context) async{
+    try{
+      final status = await permission.request();
+      if(status.isGranted){
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Permission is Granted")));
+      }else{
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Permission is not Granted")));
+
+      }
+    } catch (e) {
+      print("bluetooth status error: $e");
     }
   }
 
@@ -84,10 +100,6 @@ class _BluetoothAppState extends State<BluetoothApp> {
         _connectedDevice = device;
       });
 
-      // Handle the connection, send and receive data here
-
-      // Don't forget to close the connection when done
-      // connection.finish();
     } catch (e) {
       print("Connection failed: $e");
     }
@@ -100,9 +112,11 @@ class _BluetoothAppState extends State<BluetoothApp> {
       connection?.dispose();
       connection?.close();
     } catch (e) {
-      print("Disconnectio error: $e");
+      print("Disconnection error: $e");
     }
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -117,7 +131,10 @@ class _BluetoothAppState extends State<BluetoothApp> {
             child: Text("Scan Devices"),
           ),
           ElevatedButton(
-            onPressed: () => requestBluetoothPermissions(),
+            onPressed: (){
+              checkPermission(Permission.bluetooth, context);
+            },
+            // onPressed: () => Null,
             child: Text("Permission"),
           ),
           ElevatedButton(
@@ -149,4 +166,6 @@ class _BluetoothAppState extends State<BluetoothApp> {
       ),
     );
   }
+
+
 }
