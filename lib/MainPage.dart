@@ -297,13 +297,13 @@ class _BluetoothAppState extends State<BluetoothApp> {
       String command;
     switch (deviceNumber) {
       case 1:
-        command = state ? '1' : '0';
+        command = state ? '0' : '1';
         break;
       case 2:
-        command = state ? '3' : '2';
+        command = state ? '2' : '3';
         break;
       case 3:
-        command = state ? '5' : '4';
+        command = state ? '4' : '5';
         break;
       default:
         return;
