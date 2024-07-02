@@ -197,6 +197,7 @@ import 'led_control_page.dart';
 import 'devices_page.dart';
 import 'dart:typed_data'; // For Uint8List
 import 'dart:convert'; // For utf8
+import 'ui1.dart';
 
 
 
@@ -255,12 +256,12 @@ class _BluetoothAppState extends State<BluetoothApp> {
         _connectedDevice = device;
       });
 
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => LEDControlPage(connection: connection!),
-        ),
-      );
+      // Navigator.push(
+      //   context,
+      //   MaterialPageRoute(
+      //     builder: (context) => LEDControlPage(connection: connection!),
+      //   ),
+      // );
     } catch (e) {
       print("Connection failed: $e");
     }
@@ -325,18 +326,13 @@ class _BluetoothAppState extends State<BluetoothApp> {
 
 
     void navigateToLedPage() {
-    if (connection != null) {
+
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => LEDControlPage(connection: connection!),
+          builder: (context) => uiapp(),
         ),
       );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("No device connected!")),
-      );
-    }
   }
 
   @override
