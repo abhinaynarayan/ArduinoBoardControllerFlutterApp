@@ -173,7 +173,8 @@
 
 import 'package:flutter/material.dart';
 import 'splash_sc.dart';
-import 'MainPage.dart'; // Assume this is your home screen
+// import 'MainPage.dart';
+import 'ui2.dart';
 
 void main() => runApp(MyApp());
 
